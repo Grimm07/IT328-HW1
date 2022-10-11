@@ -1,7 +1,3 @@
-package HW1;
-
-import HW1.CNF;
-
 import java.io.*;
 import java.util.Scanner;
 

@@ -1,5 +1,3 @@
-package HW1;
-
 public class CNF
 {
   private int clauses;
