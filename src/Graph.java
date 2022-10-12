@@ -6,85 +6,74 @@ import java.util.List;
 
 
 public class Graph {
-//    private List<Vertex> Vertices;
+
+    // graph stats - total # edges present, total # vertices present, passed graph # (id)
     public int totalEdges;
     public int totalVertices;
     public int graphNumber = 0;
 
+    // graph representation - Hashmap value contains vertices connected to key
     private HashMap<Integer, List<Integer>> graph;
-
-
 
     // make an empty graph
     public Graph(int v) {
         setup(v);
     }
 
-    // constructor reads graph from file, given a starting line (reads # vertex line, then graph)
-    public Graph(Scanner scanner, int graphNum) throws EOFException, FileNotFoundException {
-        graphNumber = graphNum;
-        System.out.println("Beginning read of file.");
-        // Read in the graph
-//        Scanner scanner = new Scanner(f);
+    // scanner reads graph from file | graph num is ID | complement tells graph to read '1' vs '0' when constructing graph
+    public Graph(Scanner scanner, int graphNum, boolean complement) throws EOFException, FileNotFoundException {
+        // if the # vertices is not present, throw EOFException
         if(!scanner.hasNextInt()){
             throw new EOFException();
         }
+        graphNumber = graphNum;
         int size = scanner.nextInt(); // size = # vertices
-        setup(size);
-        String data;
-        scanner.nextLine();
-        for (int i = 0; i < size; i++) {
-            // Read in the next line
-            data = scanner.nextLine();
+        setup(size); // initialize empty graph with size from scanner
+        scanner.nextLine(); // skip to next line
+
+        for (int i = 0; i < size; i++) { // iterate through each row of graph
+            // Read line and split on whitespaces
+            String data = scanner.nextLine();
             String[] tokens = data.split(" ");
 
-            for (int j = 0; j < size; j++) {
-                if (tokens[j].equals("1")) {
-                    if(i != j){
+            for (int j = 0; j < size; j++) { // iterate through each column in row & set the edge
+                if(i != j) {
+                    if (!complement && tokens[j].equals("1")) {
+                        setEdge(i, j);
+                    } else if (complement && tokens[j].equals("0")) {
                         setEdge(i, j);
                     }
                 }
             }
-
         }
-//        scanner.close();
-        System.out.println("Finished reading file.");
-        System.out.println("-----------------------------------------------------------------------------------------");
-//        printGraph();
+
     }
 
+    // copy constructor
     public Graph(Graph g){
         totalVertices = g.totalVertices;
         totalEdges = g.totalEdges;
+        graphNumber = g.graphNumber;
         graph = new HashMap<>(g.graph);
     }
-
-//    public Graph(int v, int[][] edges){
-//        totalVertices = v;
-//        totalEdges = edges.length;
-//        graph = new HashMap<>();
-//        // representing graph as a hashs of vertices, each hash is a node, each node has a list of edges
-//        for(int i = 0; i < totalVertices; i++){
-//            setEdge(i, edges[i]);
-//        }
-//    }
 
     // setup method for constructors - initialize empty graph
     private void setup(int v){
         totalVertices = v;
         totalEdges = 0;
         graph = new HashMap<>();
-        // representing graph as a hashs of vertices, each hash is a node, each node has a list of edges
+        // representing vertices as a hash key, each value is a list, each list contains connected vertices
         for(int i = 0; i < v; i++){
             graph.put(i, new ArrayList<>());
         }
     }
 
+    // pretty print graph
     public void printGraph(){
         System.out.println("Printing Graph (|V|, |E|): (" + totalVertices + ", " + totalEdges + ")");
         System.out.println("*****************************************************************************************");
         for(Map.Entry<Integer, List<Integer>> vertex: graph.entrySet()){
-            System.out.print("Key: " + vertex.getKey() + " | AdjList: [ ");
+            System.out.print("Vertex: " + vertex.getKey() + " | AdjList: [ ");
             List<Integer> adj = vertex.getValue();
             for(int i=0; i < adj.size(); i++){
                 if(i < vertex.getValue().size() - 1)
@@ -103,18 +92,13 @@ public class Graph {
         return graph.get(i);
     }
 
-    // get number of verticies in graph
-    public int getTotalVertices() {
-        return totalVertices;
-    }
-
-    // get all vertices in graph
+    // get list of all vertices in graph
     public List<Integer> getVertices() {
         return List.copyOf(graph.keySet());
     }
 
 
-    // adds list if not already present
+    // add v<->u edge
     public void setEdge(int v, int u){
         if(!graph.containsKey(v)){
             throw new NoSuchElementException("Key "+ v +" not present in graph.");
@@ -137,10 +121,7 @@ public class Graph {
         }
     }
 
-    public void putEdge(int v, List<Integer> edges){
-        graph.replace(v, edges);
-    }
-
+    // remove edge u<->v from graph
     public void removeEdge(int v, int u){
         List<Integer> vList = graph.remove(v);
         List<Integer> uList = graph.remove(u);
@@ -155,23 +136,11 @@ public class Graph {
         graph.put(u, uList);
     }
 
-    public Graph getGraph(){
-        return this;
-    }
-
-    public void getVertex(int v, boolean u){
-        String out = v + "\tADJ: " + graph.get(v).toString();
-        if(!u)
-            System.out.println("V: " + out);
-        else
-            System.out.println("U: " + out);
-    }
-
 
     public static void main(String[] args) throws EOFException, FileNotFoundException {
         File file = new File("data/graphs2022.txt");
         Scanner s = new Scanner(file);
-        Graph g = new Graph(s, 0);
+        Graph g = new Graph(s, 0, false);
         g.printGraph();
         System.out.println(g.getVertices().toString());
     }
