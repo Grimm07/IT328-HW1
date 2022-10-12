@@ -1,111 +1,86 @@
-import javax.management.StringValueExp;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.function.IntFunction;
+import java.util.*;
 
 public class VertexCover {
     private static Graph graph = null;
 
     // hashset to represent included indices in cover
-    private static HashSet<Integer> coverSet = new HashSet<>();
+    private static List<Integer> coverSet = new ArrayList<>();
 
-    // boolean array indicating what idx is in cover
-    // is this needed or can we replace it with the hashet?
     private static Boolean[] VCover = null;
+
+    private static long runtime = 0;
+    private static int K;
     private static int coverCount = 0;
     VertexCover(Graph g, int k) {
         if (k < 1 || k > g.totalVertices) {
             throw new IndexOutOfBoundsException("Please try again with a valid k value. (1 <= K <= |V|");
+        } else {
+            K = k;
         }
-
-
         graph = g;
         VCover = new Boolean[g.totalVertices];
-
         // start with max cover (every vertex)
         for (int i = 0; i < VCover.length; i++) {
-            VCover[i] = true;
+            VCover[i] = false;
         }
-        coverCount = VCover.length;
+        coverCount = 0;
+        vertexCover();
 //        KCover(k);
 
     }
 
-//    public void KCover(int k){
-//        HashMap<Integer, List<Integer>> edgeList = graph.getGraph();
-//        long start = System.currentTimeMillis();
-//        // getting the minimum vertex cover (first one that works up until every vertex is in the cover) - i = k here
-//        while(k >= graph.totalEdges) // ?
-//        {
-//
-//            for(int v = 0; v < graph.totalVertices; v++){
-//                for(int u = 0; u < graph.totalVertices; u++){
-//                    if(u != v && VCover[v] && VCover[u]){ // if this edge contains nodes both in cover, remove one
-//
-//                    }
-//                }
-//            }
-//            for(Edge currEdge : currentVertex.connectedEdges)
-//            {
-//                if(vCover[currEdge.v] == false) {}
-//                else
-//                {
-//                    k++;
-//                }
-//            }
-////            numVertex++;
-//            vCover[currentVertex.name] = false;
-//            vertexList.remove(0);
-//        }
-//        long runtime = System.currentTimeMillis() - start;
-//        System.out.println("G" + graph.graphNumber + " ( "+ graph.totalVertices + ", " +graph.totalEdges + ")" + " (" + coverCount + ", " + runtime + ")\t" + coverSet.toString());
-//    }
+    private void vertexCover(){
+        long start = System.currentTimeMillis();
+        coverSet.clear();
+        Graph g = new Graph(graph);
+        for(int i = 0; i < graph.totalVertices; i++){
+            if(!VCover[i])
+            {
+                g = removeIndex(g, i);
+                VCover[i] = true;
+            } else if (!coverSet.contains(i) && coverCount < K) {
+                coverSet.add(i);
+                coverCount++;
+            }
 
-
-//    private void vertexCover(List<Vertex> vertexList, int k){
-////		ArrayList<Vertex> orderedList = vertexList;
-//        vertexList.sort(null);
-//
-//        while(k >= totalEdge/2)
-//        {
-//            Vertex currentVertex = vertexList.get(0);
-//
-//            for(Edge currEdge : currentVertex.connectedEdges)
-//            {
-//                if(vCover[currEdge.v] == false) {}
-//                else
-//                {
-//                    k++;
-//                }
-//            }
-////            numVertex++;
-//            vCover[currentVertex.name] = false;
-//            vertexList.remove(0);
-//        }
-//    }
-
-    // adds index/vertex to cover
-    private static void addIndex(int v){
-        if(!VCover[v]){
-            VCover[v] = true;
-            coverSet.add(v);
-            coverCount++;
         }
+        long end = System.currentTimeMillis();
 
+        runtime = end - start;
     }
 
-    // removes index/vertex to cover
-    private static void removeIndex(int v){
-        if(VCover[v]){
-            VCover[v] = false;
-            coverSet.remove(v);
-            coverCount--;
+
+
+
+    // remove index from cover (do a union)
+    // remove index from cover (do a union)
+    private static Graph removeIndex(Graph g, int v){
+        if(!VCover[v]) {
+            List<Integer> adjList = graph.getEdges(v);
+            for (int i = 0; i < adjList.size(); i++) {
+                int u = adjList.get(i);
+                if (!VCover[u]) {
+                    VCover[u] = true;
+                    g.removeEdge(v, u);
+//                    return addIndex(g, v, u);
+                }
+            }
         }
+
+        return g;
+
+    }
+    // add index u as child of v
+    private static Graph addIndex(Graph g, int v, int u){
+//        g.putEdge(u, new ArrayList<>());
+        if(!VCover[v]) {
+            VCover[u] = true;
+            return g;
+        }
+        return removeIndex(g, u);
     }
 
     // check if vertex is in cover
@@ -113,30 +88,50 @@ public class VertexCover {
         return coverSet.contains(v);
     }
 
+    public List<Integer> getCover(){
+        return coverSet;
+    }
+
     // pretty print cover
     public void printCover(){
-        System.out.println("Cover Count Total: " + coverCount);
-        System.out.println("-----------------------------------------------------------------------------------------");
-        int count = 0;
-        for(int i :coverSet){
-            System.out.print(i);
-            if(++count < coverCount)
-                System.out.print(",");
+        StringBuilder s = new StringBuilder();
+        s.append("G").append(graph.graphNumber).append(" (").append(graph.totalVertices).append(", ").append(graph.totalEdges).append(") ( ").append(coverCount).append(", ").append(runtime).append("ms) {");
+        coverSet.sort(Integer::compareTo);
+        for(int i = 0; i < coverSet.size(); i++){
+            s.append(coverSet.get(i));
+            if(i < coverSet.size()-1)
+                s.append(", ");
+            else
+                s.append("}");
         }
-        System.out.println("*****************************************************************************************");
+        System.out.println(s);
+
     }
 
     public static void main(String[] args) throws EOFException, FileNotFoundException {
-        Graph g = new Graph(new File(args[0]), 0);
-        g.printGraph();
-        IntFunction tmp = (i) -> i + 1;
-        System.out.println(tmp.apply(1));
+        File f = new File(args[0]);
+        System.out.println("* A Minimum Vertex Cover of every graph in graphs2022.txt *\n\t(|V|, |E|) (K, ms used) Vertex Cover");
+        Scanner s = new Scanner(f);
+        int i = 0;
+        Random r = new Random();
+        Scanner key = new Scanner(System.in);
+        while(true){
+            try {
+                Graph g = new Graph(s, i++);
+                // picking random k
+                int k = 1;
+                System.out.print("Enter K Value: ");
+                k = key.nextInt();
+                key.nextLine();
+                g.printGraph();
+                VertexCover v = new VertexCover(g, k);
+                v.printCover();
+            } catch (EOFException e){
+                s.close();
+                break;
+            }
 
-        VertexCover v = new VertexCover(g, 3);
-//        System.out.println("Getting vertex cover of k=3");
-
-//        v.getKVertexCover(0, 3);
-//        v.printCover();
+        }
 
     }
 
