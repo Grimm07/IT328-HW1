@@ -65,7 +65,9 @@ public class Clique {
               endGraph = new Graph(size, graph);
           }
 
-          endGraph.printGraph();
+          Graph g = getGraphInverse(endGraph);
+
+          // Not able to finish
 
           size = scanner.nextInt();
 	      }
