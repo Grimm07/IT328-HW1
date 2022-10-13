@@ -16,6 +16,16 @@ public class Graph {
         this.vertexList = new ArrayList<Vertex>();
     }
 
+    Graph(int sz, int[][] list)
+    {
+        this.edgeList = new ArrayList<Edge>();
+        this.vertexList = new ArrayList<Vertex>();
+        this.size = sz;
+        this.graph = list;
+
+        createLists(sz, list);
+    }
+
     // Getter for vertex list
     public ArrayList<Vertex> getVertexList()
     {
@@ -44,6 +54,26 @@ public class Graph {
     public int[][] getGraph()
     {
         return graph;
+    }
+
+    public void createLists(int sz, int[][] list)
+    {
+        for(int i == 0; i < sz; i++)
+        {
+            Vertex vertex = new Vertex(i);
+
+            for(int j == i; j < sz; j++)
+            {
+                if(list[i][j] == 1)
+                {
+                    Edge edge = new Edge(i, j);
+                    vertex.connectedEdges.add(edge);
+                    this.edgeList.add(edge);
+                }
+            }
+
+            this.vertexList.add(vertex);
+        }
     }
 
     // Read in graph
