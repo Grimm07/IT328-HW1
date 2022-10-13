@@ -33,10 +33,47 @@ public class Clique {
 
     public static void main(String[] args)
     {
-        Graph graph = new Graph();
+        try {
+	      File myObj = new File("test.txt");
+	      Scanner scanner = new Scanner(myObj);
+          int size = scanner.nextInt();
 
-        graph.readGraph();
+	    while(size != 0)
+        {
+	      String data = scanner.nextLine();
+          int[][] graph = new int[size][size];
+          Graph endGraph = null;
+	      for(int i = 0; i < size; i++)
+	      {	    	  
+	    	  // Read in the next line and parse
+	    	  data = scanner.nextLine();  	  
+	    	  String[] tokens = data.split(" ");
 
-        getGraphInverse(graph);
+	    	  for(int j = 0; j < size; j++)
+	    	  {
+	    		  if(i == j)
+	    		  {
+	    			  // if i = j, ignore it
+	    		  }
+	    		  else if(tokens[j].equals("1"))
+	    		  {
+	    			  // Create graph
+	    			  graph[i][j] = 1;
+	    		  }
+	    	  }
+
+              endGraph = new Graph(size, graph);
+          }
+
+          endGraph.printGraph();
+
+          size = scanner.nextInt();
+	      }
+          scanner.close();
+	    }
+		catch (FileNotFoundException e) {
+	      System.out.println("An error occurred.");
+	      e.printStackTrace();
+	    }
     }
 }

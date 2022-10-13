@@ -58,11 +58,11 @@ public class Graph {
 
     public void createLists(int sz, int[][] list)
     {
-        for(int i == 0; i < sz; i++)
+        for(int i = 0; i < sz; i++)
         {
             Vertex vertex = new Vertex(i);
 
-            for(int j == i; j < sz; j++)
+            for(int j = i; j < sz; j++)
             {
                 if(list[i][j] == 1)
                 {
