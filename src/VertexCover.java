@@ -8,6 +8,7 @@ public class VertexCover {
 
     // hashset to represent included indices in cover
     private static List<Integer> coverSet = new ArrayList<>();
+    private static List<Integer> nonCover = new ArrayList<>();
 
     private static Boolean[] VCover = null;
 
@@ -22,72 +23,66 @@ public class VertexCover {
         for (int i = 0; i < VCover.length; i++) {
             VCover[i] = false;
         }
-        vertexCover();
+//        coverEdges = g.totalEdges;
+        K = VCover.length;
+        vertexCover(0, VCover.length, new ArrayList<>());
+
 
     }
 
-    private void vertexCover(){
+    private List<Integer> vertexCover(int v, int k, List<Integer> potentialCover){
         long start = System.currentTimeMillis();
-        coverEdges = 0;
         coverSet.clear();
-        Graph g = new Graph(graph);
         for(int i = 0; i < graph.totalVertices; i++){
-            if(!VCover[i])
-            {
-                removeIndex(g, i);
-
-            } else {
-                coverEdges++;
+            if(removeIndex(i)){
                 coverSet.add(i);
             }
-
         }
         long end = System.currentTimeMillis();
 
         runtime = end - start;
+        return coverSet;
     }
 
-
-
-
-    // remove index from cover (do a union)
-    private static void removeIndex(Graph g, int v){
-        if(!VCover[v]) {
+    private boolean removeIndex(int v){
+        if(!VCover[v]){
             List<Integer> adjList = graph.getEdges(v);
-            for (int u : adjList) {
-                if (!VCover[u]) {
-                    VCover[u] = true;
-                    g.removeEdge(v, u);
-                    VCover[v] = true;
-                    return;
+            VCover[v] = true;
+            for(int i = 0; i < adjList.size(); i++){
+                int u = adjList.get(i);
+                if(coverSet.contains(u) || VCover[u])
+                    continue;
+                if(removeIndex(u)){
+//                    VCover[v] = false;
+                    VCover[u] = false;
+                    coverEdges++;
+                    return false;
                 }
             }
-
+            VCover[v] = true;   
+            return true;
         }
+        return false;
 
     }
 
-    private boolean KCover(int k){
-        K=k;
-        vertexCover();
-        return coverSet.size() <= k;
-    }
+
+
+
+
+
 
     // pretty print cover
     public void printCover(){
         StringBuilder s = new StringBuilder();
+//        System.out.println("K: " + K);
         s.append("G").append(graph.graphNumber).append(" (").append(graph.totalVertices).append(", ").append(graph.totalEdges).append(") ( ").append(coverSet.size()).append(", ").append(runtime).append("ms) {");
-        if(coverSet.size() + coverEdges > graph.totalVertices && K <= graph.totalVertices) { // if cover doesn't fit, try again with a bigger K
-            K++;
-            vertexCover();
-            return;
-        }
         int cnt = 0; // If we need more in the cover, add
-        while(coverSet.size() < K){
-            if(!coverSet.contains(cnt)){
-                coverSet.add(cnt++);
-            }
-        }
+//        while(coverSet.size() < K){
+//            if(!coverSet.contains(cnt)){
+//                coverSet.add(cnt++);
+//            }
+//        }
         coverSet.sort(Integer::compareTo);
         for(int i = 0; i < coverSet.size(); i++){
             s.append(coverSet.get(i));
@@ -113,6 +108,7 @@ public class VertexCover {
                 g.printGraph();
                 VertexCover v = new VertexCover(g);
                 v.printCover();
+                break;
             } catch (EOFException e){
                 s.close();
                 break;
