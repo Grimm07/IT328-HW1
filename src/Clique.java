@@ -34,7 +34,7 @@ public class Clique {
     public static void main(String[] args)
     {
         try {
-	      File myObj = new File("test.txt");
+	      File myObj = new File(args[0]);
 	      Scanner scanner = new Scanner(myObj);
           int size = scanner.nextInt();
 
@@ -65,7 +65,9 @@ public class Clique {
               endGraph = new Graph(size, graph);
           }
 
-          endGraph.printGraph();
+          Graph g = getGraphInverse(endGraph);
+
+          // Not able to finish
 
           size = scanner.nextInt();
 	      }
