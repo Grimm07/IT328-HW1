@@ -54,17 +54,17 @@ class CNF
   }
 }
 
-class vertex
+class vtx
 {
   private int value;
 
-  //Setter for the value inside of a vertex.
+  //Setter for the value inside of a vtx.
   public void setValue(int value)
   {
     this.value = value;
   }
 
-  //Getter for the value inside of a vertex.
+  //Getter for the value inside of a vtx.
   public int getValue()
   {
     return value;
@@ -134,7 +134,7 @@ public class find3SAT
     CNF cnf[] = new CNF[20];
 
     //Create array of vertices.
-    vertex v[];
+    vtx v[];
 
     //Initialize
     for (int i = 0; i < cnf.length; i++)
@@ -230,12 +230,12 @@ public class find3SAT
         list[j] = new ArrayList<Integer>();
       }
 
-      //Initialize vertex objects
-      v = new vertex[vertices.length];
+      //Initialize vtx objects
+      v = new vtx[vertices.length];
 
       for(j = 0; j < v.length; j++)
       {
-        v[j] = new vertex();
+        v[j] = new vtx();
       }
 
       //Set the default values for the vertices that make up the beginning variables.
@@ -334,7 +334,7 @@ public class find3SAT
         }
 
 
-        //Depending on the value stored in the vertex object, it will determine where to add an edge to connect vertices that share the same stored value.
+        //Depending on the value stored in the vtx object, it will determine where to add an edge to connect vertices that share the same stored value.
         if(v[j].getValue() == 1)
         {
 
@@ -409,7 +409,7 @@ public class find3SAT
       satisfiablity = (cnf[i].getVariables() + (2*cnf[i].getClauses()));
       //System.out.println("Satisfiabilty: " + satisfiablity);
 
-      //Use get vertex cover of satisfiablity number here.
+      //Use get vtx cover of satisfiablity number here.
       //determine if isSatisfiable is true or false;
 
 
@@ -419,7 +419,7 @@ public class find3SAT
         System.out.print("Solution:[");
 
         //SET TRUE OR FALSE VALUES HERE DEPENDING ON VERTICES IN SATISFIABLE VERTEX COVER.
-        //Assume vertex cover is an array EX: Int[] VertexCover.
+        //Assume vtx cover is an array EX: Int[] VertexCover.
 
 
         int[] vertexCover = {1,2,5,6,8,9,12,13,14,16};//{1, 2, 4, 5, 9, 11};
