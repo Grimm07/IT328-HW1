@@ -1,128 +1,109 @@
-//import java.util.*;
-//import java.io.*; // Import this class to handle io
-//import java.util.Scanner; // Import the Scanner class to read text files
-//
-//
-//public class findVCover
-//{
-//    public static void main(String[] args)
-//    {
-//        int size = 0;
-//        int[][] graph = null;
-//        boolean[] vCover = null;
-//        ArrayList<Edge> edgeList = new ArrayList<Edge>();
-//        ArrayList<Vertex> vertexList = new ArrayList<Vertex>();
-//        int numVertex = 0;
-//        Edge edge = null;
-//
-//
-//        // Read in the graph
-//        try {
-//            File myObj = new File(args[0]);
-//            Scanner scanner = new Scanner(myObj);
-//            size = scanner.nextInt();
-//            vCover = new boolean[size];
-//            graph = new int[size][size];
-//            String data = scanner.nextLine();
-//            for(int i = 0; i < size; i++)
-//            {
-//                // Set vCover to true
-//                vCover[i] = true;
-//
-//                // Read in the next line and parse
-//                data = scanner.nextLine();
-//                String[] tokens = data.split(" ");
-//
-//                Vertex vertex = new Vertex(i);
-//
-//                for(int j = 0; j < size; j++)
-//                {
-//                    if(i == j)
-//                    {
-//
-//                    }
-//                    else if(tokens[j].equals("1"))
-//                    {
-//                        // Create graph
-//                        graph[i][j] = 1;
-//
-//                        // List of edges
-//                        edge = new Edge(i, j);
-//                        edgeList.add(edge);
-//                        vertex.connectedEdges.add(edge);
-//                        vertex.numEdges++;
-//                        totalEdge++;
-//                    }
-//                }
-//
-//                vertexList.add(vertex);
-//            }
-//            scanner.close();
-//        }
-//        catch (FileNotFoundException e) {
-//            System.out.println("An error occurred.");
-//            e.printStackTrace();
-//        }
-//
-//        // Print graph
-////		for(int i = 0; i < size; i++)
-////		{
-////			for(int j = 0; j < size; j++)
-////			{
-////				System.out.print(graph[i][j] + " ");
-////			}
-////			System.out.println("");
-////		}
-//
-//        // Print list of edges
-////		System.out.println(edgeList);
-//
-//        long start = System.currentTimeMillis();
-//
-//
-//
-//        long end = System.currentTimeMillis();
-//
-////		for(Vertex vertex : vertexList)
-////		{
-////			System.out.println(vertex.name + " (" + vertex.numEdges + ") - " + vertex.connectedEdges);
-////		}
-//
-//        System.out.print("( " + size + ", " + totalEdge/2 + ") ");
-//        System.out.print("(size=" + numVertex + " ms=" + (end-start) + ") ");
-//        System.out.print("{");
-//
-//        for(int i = 0; i < size; i++)
-//        {
-//            if(vCover[i] == false)
-//            {
-//                System.out.print(i + " ");
-//            }
-//        }
-//
-//        System.out.print("}");
-//    }
-//    private boolean[] vCover = null;
-//    private static int totalEdge = 0;
-//    private void vertexCover(List<Vertex> vertexList, int k){
-////		ArrayList<Vertex> orderedList = vertexList;
-//        vertexList.sort(null);
-//
-//        while(k >= totalEdge/2)
-//        {
-//            Vertex currentVertex = vertexList.get(0);
-//
-//            for(Edge currEdge : currentVertex.connectedEdges)
-//            {
-//                if(vCover[currEdge.v] == false) {}
-//                else
-//                {
-//                    k++;
-//                }
-//            }
-////            numVertex++;
-//            vCover[currentVertex.name] = false;
-//            vertexList.remove(0);
-//        }
-//    }
-//}
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
+
+public class findVCover {
+    private static Graph graph = null;
+
+    // hashset to represent included indices in cover
+    private static List<Integer> coverSet = new ArrayList<>();
+    private static List<Integer> nonCover = new ArrayList<>();
+
+    private static Boolean[] VCover = null;
+
+    private static long runtime = 0;
+    private static int K;
+    private static int coverEdges = 0;
+    findVCover(Graph g) {
+        K=1;
+        VCover = new Boolean[g.getSize()];
+        // start with max cover (every vertex)
+        for (int i = 0; i < VCover.length; i++) {
+            VCover[i] = false;
+        }
+//        coverEdges = g.totalEdges;
+        K = VCover.length;
+        vertexCover(VCover.length);
+
+
+    }
+
+    private void vertexCover(int k) {
+        long start = System.currentTimeMillis();
+        coverSet.clear();
+        for(int i = 0; i < graph.getSize(); i++){
+            if(removeIndex(graph.getGraph(), i)){
+                coverSet.add(i);
+
+            }
+        }
+        long end = System.currentTimeMillis();
+
+        runtime = end - start;
+    }
+
+    private boolean removeIndex(int[][] g, int v){
+        if(!VCover[v]){
+//            List<Integer> adjList = (v);
+            int[] adjList = g[v];
+            VCover[v] = true;
+            for(int i = 0; i < adjList.length; i++){
+                int u = adjList[i];
+                if(coverSet.contains(u) || VCover[u])
+                    continue;
+                if(removeIndex(g, u)){
+//                    VCover[v] = false;
+                    VCover[u] = false;
+                    coverEdges++;
+                    return false;
+                }
+            }
+            VCover[v] = true;
+            return true;
+        }
+        return false;
+
+    }
+
+
+
+
+
+
+
+    // pretty print cover
+    public void printCover(){
+        StringBuilder s = new StringBuilder();
+        s.append("G0: ").append(" (").append(graph.getSize()).append(", ").append("_").append(") ( ").append(coverSet.size()).append(", ").append(runtime).append("ms) {");
+        coverSet.sort(Integer::compareTo);
+        for(int i = 0; i < coverSet.size(); i++){
+            s.append(coverSet.get(i));
+            if(i < coverSet.size()-1)
+                s.append(", ");
+            else
+                s.append("}");
+
+        }
+
+        System.out.println(s);
+
+    }
+
+    public static void main(String[] args) throws FileNotFoundException {
+        File f = new File(args[0]);
+        System.out.println("* A Minimum Vertex Cover of every graph in graphs2022.txt *\n\t(|V|, |E|) (K, ms used) Vertex Cover");
+        Scanner s = new Scanner(f);
+        int i = 0;
+        Graph g = new Graph(f);
+        while(true){
+            g.readGraph();
+            g.printGraph();
+            findVCover v = new findVCover(g);
+            v.printCover();
+
+        }
+
+    }
+
+}

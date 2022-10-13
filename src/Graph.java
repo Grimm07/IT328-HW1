@@ -10,8 +10,10 @@ public class Graph {
     private int size;
     private int[][] graph;
 
-    Graph()
-    {
+    private Scanner graphScan;
+
+    Graph(File f) throws FileNotFoundException {
+        graphScan = new Scanner(f);
         this.edgeList = new ArrayList<Edge>();
         this.vertexList = new ArrayList<Vertex>();
     }
@@ -80,16 +82,17 @@ public class Graph {
     public void readGraph()
     {
 		try {
-	      File myObj = new File("test.txt");
-	      Scanner scanner = new Scanner(myObj);
-	      setSize(scanner.nextInt());
+          if(!graphScan.hasNextInt()){
+              throw new FileNotFoundException();
+          }
+	      setSize(graphScan.nextInt());
           setGraph(size);
 
-	      String data = scanner.nextLine();
+	      String data = graphScan.nextLine();
 	      for(int i = 0; i < size; i++)
 	      {	    	  
 	    	  // Read in the next line and parse
-	    	  data = scanner.nextLine();  	  
+	    	  data = graphScan.nextLine();
 	    	  String[] tokens = data.split(" ");
 	    	  
 	    	  Vertex vertex = new Vertex(i);
@@ -113,11 +116,9 @@ public class Graph {
 	    	  }
 	    	  vertexList.add(vertex);
 	      }
-	      scanner.close();
 	    }
 		catch (FileNotFoundException e) {
-	      System.out.println("An error occurred.");
-	      e.printStackTrace();
+	      graphScan.close();
 	    }
     }
 
