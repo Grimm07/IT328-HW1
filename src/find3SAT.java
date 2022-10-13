@@ -154,7 +154,7 @@ public class find3SAT
     long start;
     long end;
     int satisfiablity;
-    boolean isSatisfiable = true;
+    boolean isSatisfiable = false;
     int varTracker = 0;
     int[] variables;
     int[] vertices;
@@ -286,7 +286,7 @@ public class find3SAT
 
       }
 
-      System.out.println("Graph: " + (i+1));
+//      System.out.println("Graph: " + (i+1));
 
       //Insert the default edges for the vertices that make up the beginning variables.
       if(cnf[i].getVariables() == 2)
@@ -380,13 +380,13 @@ public class find3SAT
 
       }
 
-      System.out.print("Adjacency List: \n");
-      printAdjList(list, cnf[i].getVertices());
+//      System.out.print("Adjacency List: \n");
+//      printAdjList(list, cnf[i].getVertices());
 
       int[][] adjMatrix = convertList(list, cnf[i].getVertices());
 
-      System.out.print("Adjacency Matrix: \n");
-      printAdjMatrix(adjMatrix, cnf[i].getVertices());
+//      System.out.print("Adjacency Matrix: \n");
+//      printAdjMatrix(adjMatrix, cnf[i].getVertices());
 
       ver = 0;
 

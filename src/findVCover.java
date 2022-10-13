@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class findVCover {
-    private static Graph graph = null;
+    private static int[][] graph = null;
 
     // hashset to represent included indices in cover
     private static List<Integer> coverSet = new ArrayList<>();
@@ -24,6 +24,7 @@ public class findVCover {
         }
 //        coverEdges = g.totalEdges;
         K = VCover.length;
+        graph = g.getGraph();
         vertexCover(VCover.length);
 
 
@@ -32,8 +33,8 @@ public class findVCover {
     private void vertexCover(int k) {
         long start = System.currentTimeMillis();
         coverSet.clear();
-        for(int i = 0; i < graph.getSize(); i++){
-            if(removeIndex(graph.getGraph(), i)){
+        for(int i = 0; i < graph.length; i++){
+            if(removeIndex(graph, i)){
                 coverSet.add(i);
 
             }
@@ -66,16 +67,10 @@ public class findVCover {
 
     }
 
-
-
-
-
-
-
     // pretty print cover
     public void printCover(){
         StringBuilder s = new StringBuilder();
-        s.append("G0: ").append(" (").append(graph.getSize()).append(", ").append("_").append(") ( ").append(coverSet.size()).append(", ").append(runtime).append("ms) {");
+        s.append("G0: ").append(" (").append(graph.length).append(", ").append("_").append(") ( ").append(coverSet.size()).append(", ").append(runtime).append("ms) {");
         coverSet.sort(Integer::compareTo);
         for(int i = 0; i < coverSet.size(); i++){
             s.append(coverSet.get(i));
@@ -97,10 +92,15 @@ public class findVCover {
         int i = 0;
         Graph g = new Graph(f);
         while(true){
-            g.readGraph();
-            g.printGraph();
-            findVCover v = new findVCover(g);
-            v.printCover();
+            try {
+                g.readGraph();
+//                g.printGraph();
+                findVCover v = new findVCover(g);
+                v.printCover();
+            } catch(IllegalStateException e){
+                break;
+            }
+
 
         }
 
